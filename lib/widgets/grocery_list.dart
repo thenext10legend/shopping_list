@@ -1,7 +1,7 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_field, unused_local_variable
 
 import 'package:flutter/material.dart';
-import 'package:shopping_list/data/dummy_items.dart';
+import 'package:shopping_list/models/grocery_item.dart';
 import 'package:shopping_list/widgets/new_item.dart';
 
 class GroceryList extends StatefulWidget {
@@ -12,6 +12,23 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
+  final List<GroceryItem> _groceryItems = [];
+
+  void _addItem() async {
+    final newItem = await Navigator.of(context).push<GroceryItem>(
+      MaterialPageRoute(
+        builder: (ctx) => NewItem(),
+      ),
+    );
+
+    if (newItem == null) {
+      return;
+    }
+    setState(() {
+      _groceryItems.add(newItem);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,13 +36,7 @@ class _GroceryListState extends State<GroceryList> {
         title: const Text("Your Groceries"),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) => NewItem(),
-                ),
-              );
-            },
+            onPressed: _addItem,
             icon: Icon(
               Icons.add,
             ),
@@ -33,15 +44,15 @@ class _GroceryListState extends State<GroceryList> {
         ],
       ),
       body: ListView.builder(
-          itemCount: groceryItems.length,
+          itemCount: _groceryItems.length,
           itemBuilder: (ctx, index) => ListTile(
                 leading: Container(
                   width: 24,
                   height: 24,
-                  color: groceryItems[index].category.color,
+                  color: _groceryItems[index].category.color,
                 ),
-                trailing: Text(groceryItems[index].quantity.toString()),
-                title: Text(groceryItems[index].name),
+                trailing: Text(_groceryItems[index].quantity.toString()),
+                title: Text(_groceryItems[index].name),
               )),
     );
   }
