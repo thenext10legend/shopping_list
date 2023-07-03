@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unused_field, prefer_final_fields
+// ignore_for_file: prefer_const_constructors, unused_field, prefer_final_fields, use_build_context_synchronously, unused_local_variable
 
 import 'dart:convert';
 
@@ -20,14 +20,14 @@ class _NewItemState extends State<NewItem> {
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables];
 
-  void _saveItem() {
+  void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final url = Uri.https(
         "flutter-prep-d78ae-default-rtdb.firebaseio.com",
         "shopping-list.json",
       );
-      http.post(
+      final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +40,10 @@ class _NewItemState extends State<NewItem> {
           },
         ),
       );
-      //Navigator.of(context).pop();
+      if (!context.mounted) {
+        return;
+      }
+      Navigator.of(context).pop();
     }
   }
 
