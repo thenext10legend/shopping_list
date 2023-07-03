@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_field, unused_local_variable, unused_element, avoid_print, no_leading_underscores_for_local_identifiers
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_field, unused_local_variable, unused_element, avoid_print, no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -76,10 +76,28 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
-  void _removeItem(GroceryItem item) {
+  void _removeItem(GroceryItem item) async {
+    final index = _groceryItems.indexOf(item);
     setState(() {
       _groceryItems.remove(item);
     });
+    final url = Uri.https(
+      "flutter-prep-d78ae-default-rtdb.firebaseio.com",
+      "shopping-list/${item.id}.json",
+    );
+    final repsonse = await http.delete(url);
+    if (repsonse.statusCode >= 400) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Sorry the item could not be deleted. Please try again later.",
+          ),
+        ),
+      );
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
   }
 
   @override
