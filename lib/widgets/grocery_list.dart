@@ -18,6 +18,7 @@ class GroceryList extends StatefulWidget {
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
   var _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -31,6 +32,11 @@ class _GroceryListState extends State<GroceryList> {
       "shopping-list.json",
     );
     final response = await http.get(url);
+    if (response.statusCode >= 400) {
+      setState(() {
+        _error = "Failed to fetch data.Please try again later.";
+      });
+    }
     final Map<String, dynamic> listData = json.decode(response.body);
     final List<GroceryItem> loadedItems = [];
     for (final item in listData.entries) {
@@ -106,6 +112,12 @@ class _GroceryListState extends State<GroceryList> {
                   title: Text(_groceryItems[index].name),
                 ),
               ));
+    }
+
+    if (_error != null) {
+      content = Center(
+        child: Text(_error!),
+      );
     }
     return Scaffold(
       appBar: AppBar(
